@@ -24,16 +24,6 @@
 .statement-active{
     display: flex;
 }
-.statementtitlefull{
-    width: 100%;
-    display: flex;
-    border: 1px solid gray;
-    background-color: rgb(225, 225, 225);
-}
-.statementtitlefull p{
-    color: black;
-    padding: 0.5rem 1rem;
-}
 .profilestatementbox{
     width: 100%;
     border: 1px solid gray;
@@ -50,8 +40,35 @@
     font-size: 0.9rem;
     font-weight: 500;
     padding: 0.5rem;
+    width: 25%;
 }
 .forstatementbold{
     font-size: 0.95rem;
+    font-weight: 600;
+}
+.bottomcalc{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.forcalcbox{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid gray;
+}
+.totalwrittentext{
+    width: 50%;
+    color: black;
+    padding: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+.totaladdedamount{
+    width: 25%;
+    color: black;
+    padding: 0.5rem;
+    font-size: 1rem;
     font-weight: 600;
 }

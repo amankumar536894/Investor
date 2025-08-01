@@ -14,7 +14,7 @@ function App() {
       element: <Dashboard />
     },
     {
-      path: '/loggin',
+      path: '/login',
       element: <Login />
     },
     {
