@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import './InvestorsSection.css'
 import { Plus, Search, TrendingUp, SquarePen, UserPen, Calendar, X } from 'lucide-react'
 import EditInvestorDetails from '../EditInvestorDetails/EditInvestorDetails'
+import Statement from '../Statement/Statement'
 
 const dummyuser = [
     {
@@ -99,6 +100,7 @@ const dummyuser = [
 const InvestorsSection = () => {
     const [adduserpopup, setAdduserpopup] = useState(false)
     const [edituserpopup, setEdituserpopup] = useState(false)
+    const [openStatement, setOpenStatement] = useState(false)
 
 
     return (
@@ -169,7 +171,9 @@ const InvestorsSection = () => {
                                 <div className='totalinvested'>₹ 12,89,789</div>
                                 <div className='totalrevenue'>₹ 52,67,529</div>
                                 <div className='investorstatus'>Active</div>
-                                <div className="profileselect"><UserPen /></div>
+                                <div className="profileselect">
+                                    <UserPen onClick={()=>{setOpenStatement(true)}} />
+                                </div>
                                 <div className='actionbtn' onClick={()=>{setEdituserpopup(true)}}>
                                     <SquarePen />
                                     <p>Edit</p>
@@ -200,6 +204,7 @@ const InvestorsSection = () => {
                 </div>
 
                 <EditInvestorDetails edituserpopup={edituserpopup} setEdituserpopup={setEdituserpopup} />
+                <Statement openStatement={openStatement} setOpenStatement={setOpenStatement} />
             </div>
         </>
     )

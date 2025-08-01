@@ -1,0 +1,57 @@
+.statement{
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.671);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+.statementinner{
+    width: 50%;
+    background-color: white;
+    position: relative;
+    padding: 2rem;
+}
+.statementcuticon{
+    color: gray;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}
+.statement-active{
+    display: flex;
+}
+.statementtitlefull{
+    width: 100%;
+    display: flex;
+    border: 1px solid gray;
+    background-color: rgb(225, 225, 225);
+}
+.statementtitlefull p{
+    color: black;
+    padding: 0.5rem 1rem;
+}
+.profilestatementbox{
+    width: 100%;
+    border: 1px solid gray;
+}
+.profilestatementheader{
+    width: 100%;
+    color: black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 0.5px solid gray;
+}
+.profilestatementheadernavs{
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.5rem;
+}
+.forstatementbold{
+    font-size: 0.95rem;
+    font-weight: 600;
+}
