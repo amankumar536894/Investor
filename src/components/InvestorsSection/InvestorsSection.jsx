@@ -45,7 +45,7 @@ const InvestorsSection = () => {
 
         try {
             setIsLoading(true)
-            const response = await fetch('http://localhost:5000/api/investors', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -69,7 +69,7 @@ const InvestorsSection = () => {
         if (!token) return
 
         try {
-            const response = await fetch('http://localhost:5000/api/investors/stats', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors/stats`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -89,7 +89,7 @@ const InvestorsSection = () => {
         if (!token) return
 
         try {
-            const response = await fetch('http://localhost:5000/api/investors', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -160,7 +160,7 @@ const InvestorsSection = () => {
         if (!token || !selectedInvestor) return
 
         try {
-            const response = await fetch(`http://localhost:5000/api/investors/${selectedInvestor._id}`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors/${selectedInvestor._id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -197,7 +197,7 @@ const InvestorsSection = () => {
         if (!token || !selectedInvestor) return
 
         try {
-            const response = await fetch(`http://localhost:5000/api/investors/${selectedInvestor._id}`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors/${selectedInvestor._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -321,7 +321,7 @@ const InvestorsSection = () => {
                                 <div className='investorjoindate'>{formatDate(investor.joinDate)}</div>
                                 <div className='totalinvested'>{formatCurrency(investor.totalMoneyInvested)}</div>
                                 <div className='totalrevenue'>{formatCurrency(investor.totalReturns)}</div>
-                                <div className={`investorstatus ${investor.status}`}>{investor.status}</div>
+                                <div className='investorstatus'>{investor.status}</div>
                                 <div className="profileselect">
                                     <UserPen onClick={()=>{setOpenStatement(true)}} />
                                 </div>

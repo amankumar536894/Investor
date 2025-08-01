@@ -1,9 +1,10 @@
-import React from 'react'
+import React, {useState} from 'react'
 import './WithdrawlSection.css'
 import '../InvestorsSection/InvestorsSection.css'
 
 
 import { Plus, Search, BanknoteArrowDown } from 'lucide-react'
+import ConfirmWithdrawl from '../ConfirmWithdrawl/ConfirmWithdrawl'
 
 const dummyuser = [
     {
@@ -99,6 +100,9 @@ const dummyuser = [
 ]
 
 const WithdrawlSection = () => {
+    const [withdrawpopup, setWithdrawpopup] = useState(false)
+
+
     return (
         <>
             <div className="overallleft">
@@ -135,13 +139,15 @@ const WithdrawlSection = () => {
                                     <input className='withamountpg' type='text' placeholder='Amount' />
                                 </div>
                                 <div className='actionbtn' >
-                                    <p className='formorestyle'>Withdrawl</p>
+                                    <p onClick={()=>{setWithdrawpopup(true)}} className='formorestyle'>Withdrawl</p>
                                 </div>
                             </div>
                         )
                     })}
                     
                 </div>
+
+                <ConfirmWithdrawl withdrawpopup={withdrawpopup} setWithdrawpopup={setWithdrawpopup} />
             </div>
         </>
     )

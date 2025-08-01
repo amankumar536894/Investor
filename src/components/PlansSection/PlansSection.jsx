@@ -33,7 +33,7 @@ const PlansSection = () => {
 
         try {
             setIsLoading(true)
-            const response = await fetch('http://localhost:5000/api/investment-plans', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investment-plans`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ const PlansSection = () => {
         if (!token) return
 
         try {
-            const response = await fetch('http://localhost:5000/api/investment-plans', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}api/investment-plans`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -118,7 +118,7 @@ const PlansSection = () => {
         if (!token || !selectedPlan) return
 
         try {
-            const response = await fetch(`http://localhost:5000/api/investment-plans/${selectedPlan._id}`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investment-plans/${selectedPlan._id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -155,7 +155,7 @@ const PlansSection = () => {
         if (!token || !selectedPlan) return
 
         try {
-            const response = await fetch(`http://localhost:5000/api/investment-plans/${selectedPlan._id}`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investment-plans/${selectedPlan._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
