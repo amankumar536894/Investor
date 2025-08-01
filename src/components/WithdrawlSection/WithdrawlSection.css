@@ -1,0 +1,16 @@
+.formorestyle{
+    background-color: gray;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+}
+.withdrawlsecinput{
+    width: 15%;
+    padding: 1rem;
+}
+.withamountpg{
+    width: 100%;
+    padding: 0.5rem;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+}

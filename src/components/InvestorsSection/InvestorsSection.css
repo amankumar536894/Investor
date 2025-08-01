@@ -1,0 +1,142 @@
+.investorpagefour{
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+.investorpagefourper{
+    background-color: #4C4C4C;
+    width: 100%;
+    border: 1px solid gray;
+    border-radius: 10px;
+    padding:2rem 1.5rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 1rem;
+    gap: 1rem;
+}
+.investorpagefourpertitle{
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+.investorpagefourperdesc{
+    font-size: 0.9rem;
+    color: rgb(196, 196, 196);
+}
+.investorstatsicon{
+    background-color: rgb(255, 255, 255);
+    color: gray;
+    width: 2.5rem;
+    height: auto;
+    padding: 0.5rem;
+    border-radius: 10px;
+}
+.investorsdetailssection{
+    width: 100%;
+    border: 0.5px solid gray;
+    border-radius: 10px;
+    overflow: scroll;
+}
+.investordetailsperrow{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.investorname{
+    width:20%;
+    padding: 1rem;
+}
+.investorcontact{
+    width: 15%;
+    padding: 1rem 0;
+}
+.investorjoindate{
+    width: 10%;
+    padding: 1rem 0;
+}
+.totalinvested{
+    width: 15%;
+    padding: 1rem 0;
+}
+.totalrevenue{
+    width: 15%;
+    padding: 1rem 0;
+}
+.investorstatus{
+    width: 10%;
+    padding: 1rem 0;
+}
+.actionbtn{
+    width: 10%;
+    padding: 1rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+.forbgandbold{
+    font-size: 1.1rem;
+    font-weight: 600;
+    background-color: rgb(47, 47, 47);
+}
+.profileselect{
+    width: 5%;
+    padding: 1rem 0;
+}
+.addformpopup{
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.711);
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+.inneraddformppup{
+    width: 40%;
+    background-color: rgb(208, 208, 208);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border: 5px;
+    position: relative;
+}
+.addformpopline{
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+}
+.addforminputper{
+    width: 50%;
+    padding: 0.5rem;
+    outline: none;
+    border: none;
+    color: rgb(89, 89, 89);
+    font-size: 1.1rem;
+    border-radius: 5px;
+}
+.addforminputper::placeholder{
+    color: rgb(89, 89, 89);
+}
+.investnowbtn{
+    width: 100%;
+    padding: 0.6rem;
+    text-align: center;
+    background-color: black;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.cutaddform{
+    color: black;
+    position: absolute;
+    top: 0.1rem;
+    right: 0.1rem;
+}
+.addformpopupactive{
+    display: flex;
+}
