@@ -121,4 +121,74 @@
     border-radius: 10px;
     font-weight: 600;
     text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.allinvestment:hover {
+    background-color: #333;
+    transform: translateY(-1px);
+}
+
+/* Loading styles */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    color: white;
+    gap: 1rem;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #333;
+    border-top: 3px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* No data styles */
+.no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #979797;
+    font-style: italic;
+    border: 1px dashed #333;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.no-data p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .fourall {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .fourall {
+        grid-template-columns: 1fr;
+    }
+    
+    .twobigdash {
+        flex-direction: column;
+    }
+    
+    .eachtwobig {
+        width: 100%;
+    }
 }

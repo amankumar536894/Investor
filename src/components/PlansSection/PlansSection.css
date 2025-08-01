@@ -27,6 +27,14 @@
     padding: 0.2rem 0.5rem;
     border-radius: 15px;
 }
+.planstatus.active {
+    background-color: #4CAF50;
+    color: white;
+}
+.planstatus.inactive {
+    background-color: #f44336;
+    color: white;
+}
 .rangebox{
     width: 100%;
     padding: 1rem;
@@ -86,6 +94,12 @@
     padding: 1rem;
     background-color: #272727;
     border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.planperbtn:hover {
+    background-color: #333;
+    transform: translateY(-1px);
 }
 
 .addplanpopup{
@@ -136,12 +150,83 @@
     text-align: center;
     background-color: black;
     cursor: pointer;
+    transition: all 0.3s ease;
+}
+.planaddnow:hover {
+    background-color: #333;
 }
 .planaddcross{
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
+    cursor: pointer;
 }
 .addplanpopupactive{
     display: flex;
+}
+
+/* Loading styles */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    color: white;
+    gap: 1rem;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #333;
+    border-top: 3px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* No plans styles */
+.no-plans {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #979797;
+    font-style: italic;
+    border: 1px dashed #333;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.no-plans p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+    .planmainbox {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .inneraddplanpopup {
+        width: 90%;
+        padding: 1.5rem;
+    }
+    
+    .inneraddpopfull {
+        flex-direction: column;
+    }
+    
+    .inneraddpopfull input {
+        width: 100%;
+    }
 }

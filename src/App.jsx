@@ -1,5 +1,7 @@
 import './App.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
+import ProtectedRoute from './components/ProtectedRoute'
 import Dashboard from './pages/Dashboard/Dashboard'
 import InvestmentPlans from './pages/InvestmentPlans/InvestmentPlans'
 import Investors from './pages/Investors/Investors'
@@ -11,7 +13,11 @@ function App() {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <Dashboard />
+      element: (
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      )
     },
     {
       path: '/login',
@@ -19,22 +25,34 @@ function App() {
     },
     {
       path: '/investment-plans',
-      element: <InvestmentPlans/>
+      element: (
+        <ProtectedRoute>
+          <InvestmentPlans/>
+        </ProtectedRoute>
+      )
     },
     {
       path: '/investors',
-      element: <Investors/>
+      element: (
+        <ProtectedRoute>
+          <Investors/>
+        </ProtectedRoute>
+      )
     },
     {
       path: '/withdrawals',
-      element: <Withdrawals/>
+      element: (
+        <ProtectedRoute>
+          <Withdrawals/>
+        </ProtectedRoute>
+      )
     },
   ])
 
   return (
-    <>
+    <AuthProvider>
       <RouterProvider router={router} />
-    </>
+    </AuthProvider>
   )
 }
 
