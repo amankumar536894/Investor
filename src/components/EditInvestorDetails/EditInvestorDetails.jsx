@@ -2,10 +2,22 @@ import React from 'react'
 import './EditInvestorDetails.css'
 import { X, Trash } from 'lucide-react'
 
-const EditInvestorDetails = ({edituserpopup, setEdituserpopup, formData, setFormData, onUpdate, onDelete}) => {
+const EditInvestorDetails = ({edituserpopup, setEdituserpopup, formData, setFormData, onUpdate, onDelete, investmentPlans}) => {
   const handleUpdate = () => {
+    console.log('Update button clicked')
+    console.log('Current formData:', formData)
+    
+    // Basic validation - only name and phone number are required
+    if (!formData.name || !formData.phoneNumber) {
+      alert('Please fill in required fields: Name and Phone Number')
+      return
+    }
+
     if (onUpdate) {
+      console.log('Calling onUpdate function')
       onUpdate()
+    } else {
+      console.error('onUpdate function is not provided')
     }
   }
 
@@ -47,19 +59,22 @@ const EditInvestorDetails = ({edituserpopup, setEdituserpopup, formData, setForm
             <div className='fullwidthouterinputeditman'>
                 <input 
                     className='innerfullwidthman' 
-                    type='email' 
-                    placeholder='Email Address' 
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    type='text' 
+                    placeholder='Street Address (Optional)' 
+                    value={formData.address.street}
+                    onChange={(e) => setFormData({
+                        ...formData, 
+                        address: {...formData.address, street: e.target.value}
+                    })}
                 />
                 <input 
                     className='innerfullwidthman' 
                     type='text' 
-                    placeholder='Bank Account Number' 
-                    value={formData.bankDetails.accountNumber}
+                    placeholder='City (Optional)' 
+                    value={formData.address.city}
                     onChange={(e) => setFormData({
                         ...formData, 
-                        bankDetails: {...formData.bankDetails, accountNumber: e.target.value}
+                        address: {...formData.address, city: e.target.value}
                     })}
                 />
             </div>
@@ -67,21 +82,65 @@ const EditInvestorDetails = ({edituserpopup, setEdituserpopup, formData, setForm
                 <input 
                     className='innerfullwidthman' 
                     type='text' 
-                    placeholder='IFSC Code' 
-                    value={formData.bankDetails.ifsc}
+                    placeholder='State (Optional)' 
+                    value={formData.address.state}
                     onChange={(e) => setFormData({
                         ...formData, 
-                        bankDetails: {...formData.bankDetails, ifsc: e.target.value}
+                        address: {...formData.address, state: e.target.value}
                     })}
                 />
                 <input 
                     className='innerfullwidthman' 
                     type='text' 
-                    placeholder='Bank Name' 
+                    placeholder='Pincode (Optional)' 
+                    value={formData.address.pincode}
+                    onChange={(e) => setFormData({
+                        ...formData, 
+                        address: {...formData.address, pincode: e.target.value}
+                    })}
+                />
+            </div>
+            <div className='fullwidthouterinputeditman'>
+                <input 
+                    className='innerfullwidthman' 
+                    type='text' 
+                    placeholder='Bank Account Number (Optional)' 
+                    value={formData.bankDetails.accountNumber}
+                    onChange={(e) => setFormData({
+                        ...formData, 
+                        bankDetails: {...formData.bankDetails, accountNumber: e.target.value}
+                    })}
+                />
+                <input 
+                    className='innerfullwidthman' 
+                    type='text' 
+                    placeholder='IFSC Code (Optional)' 
+                    value={formData.bankDetails.ifscCode}
+                    onChange={(e) => setFormData({
+                        ...formData, 
+                        bankDetails: {...formData.bankDetails, ifscCode: e.target.value}
+                    })}
+                />
+            </div>
+            <div className='fullwidthouterinputeditman'>
+                <input 
+                    className='innerfullwidthman' 
+                    type='text' 
+                    placeholder='Bank Name (Optional)' 
                     value={formData.bankDetails.bankName}
                     onChange={(e) => setFormData({
                         ...formData, 
                         bankDetails: {...formData.bankDetails, bankName: e.target.value}
+                    })}
+                />
+                <input 
+                    className='innerfullwidthman' 
+                    type='text' 
+                    placeholder='Account Holder Name (Optional)' 
+                    value={formData.bankDetails.accountHolderName}
+                    onChange={(e) => setFormData({
+                        ...formData, 
+                        bankDetails: {...formData.bankDetails, accountHolderName: e.target.value}
                     })}
                 />
             </div>
@@ -93,14 +152,20 @@ const EditInvestorDetails = ({edituserpopup, setEdituserpopup, formData, setForm
                     value={formData.totalMoneyInvested}
                     onChange={(e) => setFormData({...formData, totalMoneyInvested: e.target.value})}
                 />
-                <input 
-                    className='innerfullwidthman' 
-                    type='number' 
-                    placeholder='Total Returns' 
-                    value={formData.totalReturns}
-                    onChange={(e) => setFormData({...formData, totalReturns: e.target.value})}
-                />
+                <select 
+                    className='innerfullwidthman'
+                    value={formData.investmentPlan}
+                    onChange={(e) => setFormData({...formData, investmentPlan: e.target.value})}
+                >
+                    <option value="">Select Investment Plan</option>
+                    {investmentPlans.map((plan) => (
+                        <option key={plan._id} value={plan._id}>
+                            {plan.name}
+                        </option>
+                    ))}
+                </select>
             </div>
+
             <div className='editinvestorbtns'>
                 <p className='editinvestorbtns-delete' onClick={handleDelete}>
                     <Trash size={16} />

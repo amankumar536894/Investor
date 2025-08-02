@@ -24,7 +24,7 @@ const Dash = () => {
         setIsLoading(true)
         
         // Fetch dashboard stats
-        const statsResponse = await fetch('http://localhost:5000/api/dashboard/stats', {
+        const statsResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}api/dashboard/stats`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -42,7 +42,7 @@ const Dash = () => {
         }
 
         // Fetch recent investments
-        const investmentsResponse = await fetch('http://localhost:5000/api/dashboard/recent-investments', {
+        const investmentsResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/dashboard/recent-investments`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -55,7 +55,7 @@ const Dash = () => {
         }
 
         // Fetch pending requests
-        const requestsResponse = await fetch('http://localhost:5000/api/dashboard/pending-requests', {
+        const requestsResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/dashboard/pending-requests`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

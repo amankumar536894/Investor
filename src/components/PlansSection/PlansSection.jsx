@@ -56,7 +56,7 @@ const PlansSection = () => {
 
         try {
             setIsLoading(true)
-            const response = await fetch('http://localhost:5000/api/investment-plans', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investment-plans`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -80,7 +80,7 @@ const PlansSection = () => {
         if (!token) return
 
         try {
-            const response = await fetch('http://localhost:5000/api/investment-plans', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investment-plans`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -128,10 +128,18 @@ const PlansSection = () => {
     }
 
     const handleUpdatePlan = async () => {
-        if (!token || !selectedPlan) return
+        if (!token || !selectedPlan) {
+            console.error('Missing token or selectedPlan:', { token: !!token, selectedPlan: !!selectedPlan })
+            return
+        }
 
         try {
-            const response = await fetch(`http://localhost:5000/api/investment-plans/${selectedPlan._id}`, {
+            console.log('Updating plan with data:', {
+                planId: selectedPlan._id,
+                formData: formData
+            })
+
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investment-plans/${selectedPlan._id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -152,12 +160,13 @@ const PlansSection = () => {
 
             if (response.ok) {
                 const data = await response.json()
-                console.log('Plan updated:', data)
+                console.log('Plan updated successfully:', data)
                 setEditplanpopup(false)
                 setSelectedPlan(null)
                 fetchPlans() // Refresh the plans list
             } else {
-                console.error('Failed to update plan')
+                const errorData = await response.json()
+                console.error('Failed to update plan:', errorData)
             }
         } catch (error) {
             console.error('Error updating plan:', error)
@@ -168,7 +177,7 @@ const PlansSection = () => {
         if (!token || !selectedPlan) return
 
         try {
-            const response = await fetch(`http://localhost:5000/api/investment-plans/${selectedPlan._id}`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investment-plans/${selectedPlan._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,

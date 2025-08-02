@@ -19,32 +19,52 @@ const InvestorsSection = () => {
     const [openStatement, setOpenStatement] = useState(false)
     const [selectedInvestor, setSelectedInvestor] = useState(null)
     const [searchTerm, setSearchTerm] = useState('')
+    const [investmentPlans, setInvestmentPlans] = useState([])
+    const [error, setError] = useState('')
+    const [successMessage, setSuccessMessage] = useState('')
+    const [creditPopup, setCreditPopup] = useState(false)
+    const [selectedInvestorForCredit, setSelectedInvestorForCredit] = useState(null)
+    const [creditAmount, setCreditAmount] = useState('')
+    const [creditNotes, setCreditNotes] = useState('')
     const [formData, setFormData] = useState({
         name: '',
         phoneNumber: '',
         email: '',
-        address: '',
+        address: {
+            street: '',
+            city: '',
+            state: '',
+            pincode: ''
+        },
         bankDetails: {
             accountNumber: '',
-            ifsc: '',
-            bankName: ''
+            ifscCode: '',
+            bankName: '',
+            accountHolderName: ''
         },
         totalMoneyInvested: '',
-        totalReturns: '',
+        investmentPlan: '',
         status: 'active'
     })
     const { token } = useAuth()
 
     useEffect(() => {
+        console.log('InvestorsSection useEffect triggered, token:', !!token)
         fetchInvestors()
         fetchStats()
+        fetchInvestmentPlans()
     }, [token])
 
     const fetchInvestors = async () => {
-        if (!token) return
+        console.log('InvestorsSection fetchInvestors called, token exists:', !!token)
+        if (!token) {
+            console.log('No token available, returning early')
+            return
+        }
 
         try {
             setIsLoading(true)
+            console.log('Making API request to:', `${import.meta.env.VITE_BACKEND_URL}/api/investors`)
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -52,14 +72,20 @@ const InvestorsSection = () => {
                 }
             })
 
+            console.log('Response status:', response.status)
             if (response.ok) {
                 const data = await response.json()
+                console.log('Investors data received:', data)
                 setInvestors(data.data || [])
+                setError('') // Clear any previous errors
             } else {
-                console.error('Failed to fetch investors')
+                const errorData = await response.json()
+                console.error('Failed to fetch investors:', errorData)
+                setError('Failed to load investors. Please refresh the page.')
             }
         } catch (error) {
             console.error('Error fetching investors:', error)
+            setError('Network error. Please check your connection and refresh the page.')
         } finally {
             setIsLoading(false)
         }
@@ -69,7 +95,7 @@ const InvestorsSection = () => {
         if (!token) return
 
         try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors/stats`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors/stats`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -79,16 +105,53 @@ const InvestorsSection = () => {
             if (response.ok) {
                 const data = await response.json()
                 setStats(data.data || {})
+            } else {
+                console.error('Failed to fetch stats')
             }
         } catch (error) {
             console.error('Error fetching stats:', error)
         }
     }
 
-    const handleCreateInvestor = async () => {
+    const fetchInvestmentPlans = async () => {
         if (!token) return
 
         try {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investment-plans`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+
+            if (response.ok) {
+                const data = await response.json()
+                // Filter out deleted plans and only show active plans
+                const activePlans = (data.data || []).filter(plan => 
+                    !plan.isDeleted && plan.status === 'Active'
+                )
+                setInvestmentPlans(activePlans)
+            } else {
+                console.error('Failed to fetch investment plans')
+            }
+        } catch (error) {
+            console.error('Error fetching investment plans:', error)
+        }
+    }
+
+    const handleCreateInvestor = async () => {
+        if (!token) return
+
+        // Basic validation - only name and phone number are required
+        if (!formData.name || !formData.phoneNumber) {
+            alert('Please fill in required fields: Name and Phone Number')
+            return
+        }
+
+        const initialInvestment = parseInt(formData.totalMoneyInvested) || 0
+
+        try {
+            // First, create the investor
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors`, {
                 method: 'POST',
                 headers: {
@@ -98,11 +161,16 @@ const InvestorsSection = () => {
                 body: JSON.stringify({
                     name: formData.name,
                     phoneNumber: formData.phoneNumber,
-                    email: formData.email,
-                    address: formData.address,
-                    bankDetails: formData.bankDetails,
-                    totalMoneyInvested: parseInt(formData.totalMoneyInvested) || 0,
-                    totalReturns: parseInt(formData.totalReturns) || 0,
+                    email: 'temp@gmail.com', // Always send temp email to backend
+                    address: formData.address.street || formData.address.city || formData.address.state || formData.address.pincode ? formData.address : '',
+                    bankDetails: formData.bankDetails.accountNumber || formData.bankDetails.ifscCode || formData.bankDetails.bankName || formData.bankDetails.accountHolderName ? {
+                        accountNumber: formData.bankDetails.accountNumber || '',
+                        ifscCode: formData.bankDetails.ifscCode || '',
+                        bankName: formData.bankDetails.bankName || '',
+                        accountHolderName: formData.bankDetails.accountHolderName || ''
+                    } : '',
+                    totalMoneyInvested: 0, // Start with 0, will be updated by credit transaction
+                    investmentPlan: formData.investmentPlan || null,
                     status: formData.status,
                     isDeleted: false,
                     joinDate: new Date().toISOString()
@@ -112,28 +180,61 @@ const InvestorsSection = () => {
             if (response.ok) {
                 const data = await response.json()
                 console.log('Investor created:', data)
+                
+                // If there's an initial investment amount, create a credit transaction
+                if (initialInvestment > 0) {
+                    try {
+                        const creditResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors/${data.data._id}/credit`, {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                amount: initialInvestment,
+                                notes: 'Initial investment amount'
+                            })
+                        })
+
+                        if (creditResponse.ok) {
+                            console.log('Initial credit transaction created successfully')
+                            // Show success message for the credit transaction
+                            setSuccessMessage(`Investor created successfully! Initial investment of ${formatCurrency(initialInvestment)} has been credited.`)
+                        } else {
+                            console.error('Failed to create initial credit transaction')
+                            setError('Investor created but failed to credit initial investment. Please credit manually.')
+                        }
+                    } catch (creditError) {
+                        console.error('Error creating initial credit transaction:', creditError)
+                        setError('Investor created but failed to credit initial investment. Please credit manually.')
+                    }
+                }
+
+                setError('') // Clear any previous errors
                 setAdduserpopup(false)
-                setFormData({
-                    name: '',
-                    phoneNumber: '',
-                    email: '',
-                    address: '',
-                    bankDetails: {
-                        accountNumber: '',
-                        ifsc: '',
-                        bankName: ''
-                    },
-                    totalMoneyInvested: '',
-                    totalReturns: '',
-                    status: 'active'
-                })
+                resetFormData()
                 fetchInvestors() // Refresh the investors list
                 fetchStats() // Refresh stats
+                
+                // Show success message
+                if (initialInvestment > 0) {
+                    setSuccessMessage(`Investor created successfully! Initial investment of ${formatCurrency(initialInvestment)} has been credited.`)
+                } else {
+                    setSuccessMessage('Investor created successfully!')
+                }
+                
+                // Auto-dismiss success message after 5 seconds
+                setTimeout(() => {
+                    setSuccessMessage('')
+                }, 5000)
             } else {
-                console.error('Failed to create investor')
+                const errorData = await response.json()
+                console.error('Failed to create investor:', errorData)
+                setError(errorData.message || 'Failed to create investor. Please try again.')
             }
         } catch (error) {
             console.error('Error creating investor:', error)
+            setError('Network error. Please check your connection and try again.')
         }
     }
 
@@ -142,24 +243,47 @@ const InvestorsSection = () => {
         setFormData({
             name: investor.name,
             phoneNumber: investor.phoneNumber,
-            email: investor.email,
-            address: investor.address || '',
+            email: '', // Always show empty email in edit form
+            address: investor.address || {
+                street: '',
+                city: '',
+                state: '',
+                pincode: ''
+            },
             bankDetails: investor.bankDetails || {
                 accountNumber: '',
-                ifsc: '',
-                bankName: ''
+                ifscCode: '',
+                bankName: '',
+                accountHolderName: ''
             },
             totalMoneyInvested: investor.totalMoneyInvested.toString(),
-            totalReturns: investor.totalReturns.toString(),
+            investmentPlan: investor.investmentPlan?._id || investor.investmentPlan || '',
             status: investor.status
         })
+        setError('') // Clear any previous errors
         setEdituserpopup(true)
     }
 
     const handleUpdateInvestor = async () => {
-        if (!token || !selectedInvestor) return
+        if (!token || !selectedInvestor) {
+            console.error('Missing token or selectedInvestor:', { token: !!token, selectedInvestor: !!selectedInvestor })
+            return
+        }
+
+        // Basic validation - only name and phone number are required
+        if (!formData.name || !formData.phoneNumber) {
+            setError('Please fill in required fields: Name and Phone Number')
+            return
+        }
+
+        // Bank details are optional - no validation needed
 
         try {
+            console.log('Updating investor with data:', {
+                investorId: selectedInvestor._id,
+                formData: formData
+            })
+
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors/${selectedInvestor._id}`, {
                 method: 'PUT',
                 headers: {
@@ -169,31 +293,72 @@ const InvestorsSection = () => {
                 body: JSON.stringify({
                     name: formData.name,
                     phoneNumber: formData.phoneNumber,
-                    email: formData.email,
-                    bankDetails: {
-                        accountNumber: formData.bankDetails.accountNumber,
-                        ifsc: formData.bankDetails.ifsc,
-                        bankName: formData.bankDetails.bankName
-                    },
+                    email: 'temp@gmail.com', // Always send temp email to backend
+                    address: formData.address.street || formData.address.city || formData.address.state || formData.address.pincode ? formData.address : '',
+                    bankDetails: formData.bankDetails.accountNumber || formData.bankDetails.ifscCode || formData.bankDetails.bankName || formData.bankDetails.accountHolderName ? {
+                        accountNumber: formData.bankDetails.accountNumber || '',
+                        ifscCode: formData.bankDetails.ifscCode || '',
+                        bankName: formData.bankDetails.bankName || '',
+                        accountHolderName: formData.bankDetails.accountHolderName || ''
+                    } : '',
                     totalMoneyInvested: parseInt(formData.totalMoneyInvested),
-                    totalReturns: parseInt(formData.totalReturns),
+                    investmentPlan: formData.investmentPlan || null,
                     status: formData.status
                 })
             })
 
             if (response.ok) {
                 const data = await response.json()
-                console.log('Investor updated:', data)
+                console.log('Investor updated successfully:', data)
+                setError('') // Clear any previous errors
                 setEdituserpopup(false)
                 setSelectedInvestor(null)
                 fetchInvestors() // Refresh the investors list
                 fetchStats() // Refresh stats
             } else {
-                console.error('Failed to update investor')
+                const errorData = await response.json()
+                console.error('Failed to update investor:', errorData)
+                setError(errorData.message || 'Failed to update investor. Please try again.')
             }
         } catch (error) {
             console.error('Error updating investor:', error)
+            setError('Network error. Please check your connection and try again.')
         }
+    }
+
+    const resetFormData = () => {
+        setFormData({
+            name: '',
+            phoneNumber: '',
+            email: '', // Keep empty for consistency
+            address: {
+                street: '',
+                city: '',
+                state: '',
+                pincode: ''
+            },
+            bankDetails: {
+                accountNumber: '',
+                ifscCode: '',
+                bankName: '',
+                accountHolderName: ''
+            },
+            totalMoneyInvested: '',
+            investmentPlan: '',
+            status: 'active'
+        })
+    }
+
+    const handleAddInvestorClick = () => {
+        resetFormData()
+        setAdduserpopup(true)
+        setSuccessMessage('') // Clear any previous success message
+        setError('') // Clear any previous error message
+    }
+
+    const handleCloseAddPopup = () => {
+        setAdduserpopup(false)
+        resetFormData()
     }
 
     const handleDeleteInvestor = async () => {
@@ -210,15 +375,71 @@ const InvestorsSection = () => {
 
             if (response.ok) {
                 console.log('Investor deleted successfully')
+                setError('') // Clear any previous errors
                 setEdituserpopup(false)
                 setSelectedInvestor(null)
                 fetchInvestors() // Refresh the investors list
                 fetchStats() // Refresh stats
             } else {
-                console.error('Failed to delete investor')
+                const errorData = await response.json()
+                console.error('Failed to delete investor:', errorData)
+                setError(errorData.message || 'Failed to delete investor. Please try again.')
             }
         } catch (error) {
             console.error('Error deleting investor:', error)
+            setError('Network error. Please check your connection and try again.')
+        }
+    }
+
+    const handleCreditAmountChange = (investorId, amount) => {
+        if (amount && amount > 0) {
+            setSelectedInvestorForCredit(investors.find(inv => inv._id === investorId))
+            setCreditAmount(amount.toString())
+            setCreditNotes('')
+            setCreditPopup(true)
+            setError('') // Clear any previous errors
+        } else {
+            setError('Please enter a valid amount greater than 0')
+        }
+    }
+
+    const handleCreditSubmit = async () => {
+        if (!token || !selectedInvestorForCredit || !creditAmount) {
+            setError('Please enter the amount to credit')
+            return
+        }
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors/${selectedInvestorForCredit._id}/credit`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    amount: parseInt(creditAmount),
+                    notes: creditNotes || 'Credit transaction'
+                })
+            })
+
+            if (response.ok) {
+                const data = await response.json()
+                console.log('Credit successful:', data)
+                setError('') // Clear any previous errors
+                setCreditPopup(false)
+                setSelectedInvestorForCredit(null)
+                setCreditAmount('')
+                setCreditNotes('')
+                fetchInvestors() // Refresh the investors list
+                fetchStats() // Refresh stats
+            } else {
+                const errorData = await response.json()
+                console.error('Failed to credit amount:', errorData)
+                setError(errorData.message || 'Failed to credit amount. Please try again.')
+            }
+        } catch (error) {
+            console.error('Error crediting amount:', error)
+            setError('Network error. Please check your connection and try again.')
         }
     }
 
@@ -238,7 +459,7 @@ const InvestorsSection = () => {
     const filteredInvestors = investors.filter(investor => 
         investor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         investor.phoneNumber.includes(searchTerm) ||
-        investor.email.toLowerCase().includes(searchTerm.toLowerCase())
+        (investor.email && investor.email.toLowerCase().includes(searchTerm.toLowerCase()))
     )
 
     if (isLoading) {
@@ -260,11 +481,23 @@ const InvestorsSection = () => {
                         <p className='topboxlefttitle'>Investors</p>
                         <p className='topboxleftdesc'>Manage and view all investor accounts</p>
                     </div>
-                    <div className="topboxright" onClick={()=>{setAdduserpopup(true)}}>
+                    <div className="topboxright" onClick={handleAddInvestorClick}>
                         <Plus />
                         <p>Add Investor</p>
                     </div>
                 </div>
+                {error && (
+                    <div className="error-message">
+                        <p>{error}</p>
+                        <button onClick={() => setError('')} className="error-close">×</button>
+                    </div>
+                )}
+                {successMessage && (
+                    <div className="success-message">
+                        <p>{successMessage}</p>
+                        <button onClick={() => setSuccessMessage('')} className="success-close">×</button>
+                    </div>
+                )}
                 <div className='searchbarinvestor'>
                     <Search className='searchinputlogo' />
                     <input 
@@ -313,6 +546,7 @@ const InvestorsSection = () => {
                         <div className='totalinvested forbgandbold'>Total Invested</div>
                         <div className='totalrevenue forbgandbold'>Total Returns</div>
                         <div className='investorstatus forbgandbold'>Status</div>
+                        <div className='creditamount forbgandbold'>Credit Amount</div>
                         <div className="profileselect forbgandbold">Profile</div>
                         <div className='actionbtn forbgandbold'>Actions</div>
                     </div>
@@ -325,8 +559,22 @@ const InvestorsSection = () => {
                                 <div className='totalinvested'>{formatCurrency(investor.totalMoneyInvested)}</div>
                                 <div className='totalrevenue'>{formatCurrency(investor.totalReturns)}</div>
                                 <div className={`investorstatus ${investor.status}`}>{investor.status}</div>
+                                <div className='creditamount'>
+                                    <input 
+                                        type='number' 
+                                        placeholder='Enter amount'
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleCreditAmountChange(investor._id, e.target.value)
+                                            }
+                                        }}
+                                    />
+                                </div>
                                 <div className="profileselect">
-                                    <UserPen onClick={()=>{setOpenStatement(true)}} />
+                                    <UserPen onClick={()=>{
+                                        setSelectedInvestor(investor)
+                                        setOpenStatement(true)
+                                    }} />
                                 </div>
                                 <div className='actionbtn' onClick={()=>{handleEditInvestor(investor)}}>
                                     <SquarePen />
@@ -341,9 +589,9 @@ const InvestorsSection = () => {
                     )}
                 </div>
 
-                <div className={`addformpopup ${adduserpopup ? 'addformpopupactive' : ''}`}  onClick={()=>{setAdduserpopup(false)}}>
+                <div className={`addformpopup ${adduserpopup ? 'addformpopupactive' : ''}`}  onClick={handleCloseAddPopup}>
                     <div className="inneraddformppup" onClick={(e) => e.stopPropagation()}>
-                        <X className='cutaddform' onClick={()=>{setAdduserpopup(false)}} />
+                        <X className='cutaddform' onClick={handleCloseAddPopup} />
                         <div className='addformpopline'>
                             <input 
                                 className='addforminputper' 
@@ -363,24 +611,53 @@ const InvestorsSection = () => {
                         <div className='addformpopline'>
                             <input 
                                 className='addforminputper' 
-                                type='email' 
-                                placeholder='Enter Email' 
-                                value={formData.email}
-                                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                type='text' 
+                                placeholder='Street Address (Optional)' 
+                                value={formData.address.street}
+                                onChange={(e) => setFormData({
+                                    ...formData, 
+                                    address: {...formData.address, street: e.target.value}
+                                })}
                             />
                             <input 
                                 className='addforminputper' 
                                 type='text' 
-                                placeholder='Enter Address' 
-                                value={formData.address}
-                                onChange={(e) => setFormData({...formData, address: e.target.value})}
+                                placeholder='City (Optional)' 
+                                value={formData.address.city}
+                                onChange={(e) => setFormData({
+                                    ...formData, 
+                                    address: {...formData.address, city: e.target.value}
+                                })}
                             />
                         </div>
                         <div className='addformpopline'>
                             <input 
                                 className='addforminputper' 
                                 type='text' 
-                                placeholder='Bank Account Number' 
+                                placeholder='State (Optional)' 
+                                value={formData.address.state}
+                                onChange={(e) => setFormData({
+                                    ...formData, 
+                                    address: {...formData.address, state: e.target.value}
+                                })}
+                            />
+                            <input 
+                                className='addforminputper' 
+                                type='text' 
+                                placeholder='Pincode (Optional)' 
+                                value={formData.address.pincode}
+                                onChange={(e) => setFormData({
+                                    ...formData, 
+                                    address: {...formData.address, pincode: e.target.value}
+                                })}
+                            />
+                        </div>
+
+                        <div className='addformpopline'>
+                            <input 
+                                className='addforminputper' 
+                                type='text' 
+                                placeholder='Bank Account Number (Optional)' 
                                 value={formData.bankDetails.accountNumber}
                                 onChange={(e) => setFormData({
                                     ...formData, 
@@ -390,11 +667,11 @@ const InvestorsSection = () => {
                             <input 
                                 className='addforminputper' 
                                 type='text' 
-                                placeholder='IFSC Code' 
-                                value={formData.bankDetails.ifsc}
+                                placeholder='IFSC Code (Optional)' 
+                                value={formData.bankDetails.ifscCode}
                                 onChange={(e) => setFormData({
                                     ...formData, 
-                                    bankDetails: {...formData.bankDetails, ifsc: e.target.value}
+                                    bankDetails: {...formData.bankDetails, ifscCode: e.target.value}
                                 })}
                             />
                         </div>
@@ -402,13 +679,25 @@ const InvestorsSection = () => {
                             <input 
                                 className='addforminputper' 
                                 type='text' 
-                                placeholder='Bank Name' 
+                                placeholder='Bank Name (Optional)' 
                                 value={formData.bankDetails.bankName}
                                 onChange={(e) => setFormData({
                                     ...formData, 
                                     bankDetails: {...formData.bankDetails, bankName: e.target.value}
                                 })}
                             />
+                            <input 
+                                className='addforminputper' 
+                                type='text' 
+                                placeholder='Account Holder Name (Optional)' 
+                                value={formData.bankDetails.accountHolderName}
+                                onChange={(e) => setFormData({
+                                    ...formData, 
+                                    bankDetails: {...formData.bankDetails, accountHolderName: e.target.value}
+                                })}
+                            />
+                        </div>
+                        <div className='addformpopline'>
                             <select 
                                 className='addforminputper'
                                 value={formData.status}
@@ -422,17 +711,22 @@ const InvestorsSection = () => {
                             <input 
                                 className='addforminputper' 
                                 type='number' 
-                                placeholder='Total Money Invested' 
+                                placeholder='Initial Investment Amount (optional)' 
                                 value={formData.totalMoneyInvested}
                                 onChange={(e) => setFormData({...formData, totalMoneyInvested: e.target.value})}
                             />
-                            <input 
-                                className='addforminputper' 
-                                type='number' 
-                                placeholder='Total Returns' 
-                                value={formData.totalReturns}
-                                onChange={(e) => setFormData({...formData, totalReturns: e.target.value})}
-                            />
+                            <select 
+                                className='addforminputper'
+                                value={formData.investmentPlan}
+                                onChange={(e) => setFormData({...formData, investmentPlan: e.target.value})}
+                            >
+                                <option value="">Select Investment Plan</option>
+                                {investmentPlans.map((plan) => (
+                                    <option key={plan._id} value={plan._id}>
+                                        {plan.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <p className='investnowbtn' onClick={handleCreateInvestor}>Add Investor</p>
                     </div>
@@ -445,8 +739,45 @@ const InvestorsSection = () => {
                     setFormData={setFormData}
                     onUpdate={handleUpdateInvestor}
                     onDelete={handleDeleteInvestor}
+                    investmentPlans={investmentPlans}
                 />
-                <Statement openStatement={openStatement} setOpenStatement={setOpenStatement} />
+                <Statement openStatement={openStatement} setOpenStatement={setOpenStatement} selectedInvestor={selectedInvestor} />
+
+                {/* Credit Confirmation Popup */}
+                <div className={`creditpopup ${creditPopup ? 'creditpopup-active' : ''}`} onClick={() => setCreditPopup(false)}>
+                    <div className="creditpopup-inner" onClick={(e) => e.stopPropagation()}>
+                        <X className='creditpopup-cross' onClick={() => setCreditPopup(false)} />
+                        <h3>Credit Amount to {selectedInvestorForCredit?.name}</h3>
+                        <div className='creditpopup-content'>
+                            <div className='creditpopup-input-group'>
+                                <label>Amount (₹) *</label>
+                                <input 
+                                    type='number' 
+                                    value={creditAmount}
+                                    onChange={(e) => setCreditAmount(e.target.value)}
+                                    placeholder='Enter amount (required)'
+                                />
+                            </div>
+                            <div className='creditpopup-input-group'>
+                                <label>Notes (Optional)</label>
+                                <textarea 
+                                    value={creditNotes}
+                                    onChange={(e) => setCreditNotes(e.target.value)}
+                                    placeholder='Enter notes for this credit (optional)'
+                                    rows={3}
+                                />
+                            </div>
+                        </div>
+                        <div className='creditpopup-buttons'>
+                            <button className='creditpopup-cancel' onClick={() => setCreditPopup(false)}>
+                                Cancel
+                            </button>
+                            <button className='creditpopup-confirm' onClick={handleCreditSubmit}>
+                                Confirm Credit
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </>
     )

@@ -4,8 +4,13 @@ import { X } from 'lucide-react'
 
 const EditPlanPopup = ({editplanpopup, setEditplanpopup, formData, setFormData, onUpdate}) => {
   const handleUpdate = () => {
+    console.log('Update button clicked')
+    console.log('Current formData:', formData)
     if (onUpdate) {
+      console.log('Calling onUpdate function')
       onUpdate()
+    } else {
+      console.error('onUpdate function is not provided')
     }
   }
 
