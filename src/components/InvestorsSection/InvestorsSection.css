@@ -45,11 +45,11 @@
     align-items: center;
 }
 .investorname{
-    width: 15%;
+    width: 13%;
     padding: 1rem;
 }
 .investorcontact{
-    width: 12%;
+    width: 10%;
     padding: 1rem 0;
 }
 .investorjoindate{
@@ -57,12 +57,24 @@
     padding: 1rem 0;
 }
 .totalinvested{
-    width: 12%;
+    width: 10%;
     padding: 1rem 0;
 }
 .totalrevenue{
-    width: 12%;
+    width: 10%;
     padding: 1rem 0;
+}
+.yearlyplan{
+    width: 10%;
+    padding: 1rem 0;
+    text-transform: capitalize;
+    font-weight: 500;
+}
+.yearlyplan.forbgandbold {
+    font-size: 1.1rem;
+    font-weight: 600;
+    background-color: rgb(47, 47, 47) !important;
+    color: white;
 }
 .investorstatus{
     width: 8%;
@@ -305,7 +317,7 @@
     align-items: center;
     justify-content: center;
     padding: 1rem 0;
-    width: 12%;
+    width: 10%;
 }
 
 .creditamount.forbgandbold {

@@ -165,6 +165,19 @@ const EditInvestorDetails = ({edituserpopup, setEdituserpopup, formData, setForm
                     ))}
                 </select>
             </div>
+            <div className='fullwidthouterinputeditman'>
+                <select 
+                    className='innerfullwidthman'
+                    value={formData.yearlyPlan}
+                    onChange={(e) => setFormData({...formData, yearlyPlan: e.target.value})}
+                >
+                    <option value="">Select Yearly Plan</option>
+                    <option value="basic">Basic Yearly Plan</option>
+                    <option value="premium">Premium Yearly Plan</option>
+                    <option value="elite">Elite Yearly Plan</option>
+                    <option value="custom">Custom Yearly Plan</option>
+                </select>
+            </div>
 
             <div className='editinvestorbtns'>
                 <p className='editinvestorbtns-delete' onClick={handleDelete}>

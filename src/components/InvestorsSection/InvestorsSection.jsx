@@ -171,6 +171,7 @@ const InvestorsSection = () => {
                     } : '',
                     totalMoneyInvested: 0, // Start with 0, will be updated by credit transaction
                     investmentPlan: formData.investmentPlan || null,
+                    yearlyPlan: formData.yearlyPlan || null, // Add yearly plan to backend
                     status: formData.status,
                     isDeleted: false,
                     joinDate: new Date().toISOString()
@@ -258,6 +259,7 @@ const InvestorsSection = () => {
             },
             totalMoneyInvested: investor.totalMoneyInvested.toString(),
             investmentPlan: investor.investmentPlan?._id || investor.investmentPlan || '',
+            yearlyPlan: investor.yearlyPlan || '', // Add yearly plan from investor data
             status: investor.status
         })
         setError('') // Clear any previous errors
@@ -303,6 +305,7 @@ const InvestorsSection = () => {
                     } : '',
                     totalMoneyInvested: parseInt(formData.totalMoneyInvested),
                     investmentPlan: formData.investmentPlan || null,
+                    yearlyPlan: formData.yearlyPlan || null, // Add yearly plan to backend
                     status: formData.status
                 })
             })
@@ -327,7 +330,7 @@ const InvestorsSection = () => {
     }
 
     const resetFormData = () => {
-        setFormData({
+        const newFormData = {
             name: '',
             phoneNumber: '',
             email: '', // Keep empty for consistency
@@ -345,8 +348,10 @@ const InvestorsSection = () => {
             },
             totalMoneyInvested: '',
             investmentPlan: '',
+            yearlyPlan: '', // Add yearly plan field
             status: 'active'
-        })
+        }
+        setFormData(newFormData)
     }
 
     const handleAddInvestorClick = () => {
@@ -545,6 +550,7 @@ const InvestorsSection = () => {
                         <div className='investorjoindate forbgandbold'>Join Date</div>
                         <div className='totalinvested forbgandbold'>Total Invested</div>
                         <div className='totalrevenue forbgandbold'>Total Returns</div>
+                        <div className='yearlyplan forbgandbold'>Yearly Plan</div>
                         <div className='investorstatus forbgandbold'>Status</div>
                         <div className='creditamount forbgandbold'>Credit Amount</div>
                         <div className="profileselect forbgandbold">Profile</div>
@@ -558,6 +564,7 @@ const InvestorsSection = () => {
                                 <div className='investorjoindate'>{formatDate(investor.joinDate)}</div>
                                 <div className='totalinvested'>{formatCurrency(investor.totalMoneyInvested)}</div>
                                 <div className='totalrevenue'>{formatCurrency(investor.totalReturns)}</div>
+                                <div className='yearlyplan'>{investor.yearlyPlan || 'Not Selected'}</div>
                                 <div className={`investorstatus ${investor.status}`}>{investor.status}</div>
                                 <div className='creditamount'>
                                     <input 
@@ -706,6 +713,17 @@ const InvestorsSection = () => {
                                 <option value="active">Active</option>
                                 <option value="inactive">Inactive</option>
                             </select>
+                            <select 
+                                className='addforminputper'
+                                value={formData.yearlyPlan}
+                                onChange={(e) => setFormData({...formData, yearlyPlan: e.target.value})}
+                            >
+                                <option value="">Select Yearly Plan</option>
+                                <option value="basic">Basic Yearly Plan</option>
+                                <option value="premium">Premium Yearly Plan</option>
+                                <option value="elite">Elite Yearly Plan</option>
+                                <option value="custom">Custom Yearly Plan</option>
+                            </select>
                         </div>
                         <div className='addformpopline'>
                             <input 
@@ -728,6 +746,7 @@ const InvestorsSection = () => {
                                 ))}
                             </select>
                         </div>
+
                         <p className='investnowbtn' onClick={handleCreateInvestor}>Add Investor</p>
                     </div>
                 </div>

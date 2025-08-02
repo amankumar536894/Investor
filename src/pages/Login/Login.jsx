@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './Login.css';
@@ -9,9 +9,16 @@ const Login = () => {
     password: ''
   });
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated, isLoading } = useAuth();
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (!isLoading && isAuthenticated()) {
+      navigate('/');
+    }
+  }, [isLoading, isAuthenticated, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,7 +54,7 @@ const Login = () => {
       return;
     }
 
-    setIsLoading(true);
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
@@ -81,7 +88,7 @@ const Login = () => {
         general: 'Network error. Please check your connection and try again.'
       });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -109,7 +116,7 @@ const Login = () => {
               onChange={handleChange}
               className={errors.username ? 'error' : ''}
               placeholder="Enter your username"
-              disabled={isLoading}
+              disabled={isSubmitting}
             />
             {errors.username && <span className="error-message">{errors.username}</span>}
           </div>
@@ -124,17 +131,17 @@ const Login = () => {
               onChange={handleChange}
               className={errors.password ? 'error' : ''}
               placeholder="Enter your password"
-              disabled={isLoading}
+              disabled={isSubmitting}
             />
             {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
 
           <button 
             type="submit" 
-            className={`login-button ${isLoading ? 'loading' : ''}`}
-            disabled={isLoading}
+            className={`login-button ${isSubmitting ? 'loading' : ''}`}
+            disabled={isSubmitting}
           >
-            {isLoading ? 'Signing In...' : 'Sign In'}
+            {isSubmitting ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
       </div>
