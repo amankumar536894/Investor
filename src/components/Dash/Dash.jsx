@@ -151,20 +151,20 @@ const Dash = () => {
                     {recentInvestments.length > 0 ? (
                       recentInvestments.map((investment, index) => (
                         <div key={index} className="eachtwomaintable">
-                            <div className="eachtwomaintable-left">
+                        <div className="eachtwomaintable-left">
                                 <p className='eachtwomaintable-left-name'>{investment.name || 'N/A'}</p>
                                 <p className='eachtwomaintable-left-date'>{formatDate(investment.date)}</p>
-                            </div>
-                            <div className="eachtwomaintable-right">
+                        </div>
+                        <div className="eachtwomaintable-right">
                                 <p className='eachtwomaintable-right-amount'>{formatCurrency(investment.amount)}</p>
                                 <p className='eachtwomaintable-right-plan'>{investment.plan || 'N/A'}</p>
-                            </div>
+                    </div>
                         </div>
                       ))
                     ) : (
                       <div className="no-data">
                         <p>No recent investments</p>
-                      </div>
+                        </div>
                     )}
                     <Link to='/investors' className='allinvestment'>View All Investments</Link>
                 </div>
@@ -179,20 +179,20 @@ const Dash = () => {
                     {pendingRequests.length > 0 ? (
                       pendingRequests.map((request, index) => (
                         <div key={index} className="eachtwomaintable">
-                            <div className="eachtwomaintable-left">
+                        <div className="eachtwomaintable-left">
                                 <p className='eachtwomaintable-left-name'>{request.name}</p>
                                 <p className='eachtwomaintable-left-date'>{formatDate(request.date)}</p>
-                            </div>
-                            <div className="eachtwomaintable-right">
+                        </div>
+                        <div className="eachtwomaintable-right">
                                 <p className='eachtwomaintable-right-amount'>{formatCurrency(request.moneyInvested)}</p>
                                 <p className='eachtwomaintable-right-plan'>Withdrawal</p>
-                            </div>
+                    </div>
                         </div>
                       ))
                     ) : (
                       <div className="no-data">
                         <p>No pending requests</p>
-                      </div>
+                        </div>
                     )}
                     <Link to='/withdrawals' className='allinvestment'>View All Requests</Link>
                 </div>

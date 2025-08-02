@@ -68,14 +68,18 @@
     width: 10%;
     padding: 1rem 0;
     text-transform: capitalize;
+    font-weight: 500;
+    background: none !important;
 }
 .investorstatus.active {
-    color: #4CAF50;
+    color: #4CAF50 !important;
     font-weight: 600;
+    background: none !important;
 }
 .investorstatus.inactive {
-    color: #f44336;
+    color: #f44336 !important;
     font-weight: 600;
+    background: none !important;
 }
 .actionbtn{
     width: 10%;

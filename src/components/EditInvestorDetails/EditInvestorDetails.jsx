@@ -55,15 +55,6 @@ const EditInvestorDetails = ({edituserpopup, setEdituserpopup, formData, setForm
                 <input 
                     className='innerfullwidthman' 
                     type='text' 
-                    placeholder='Address' 
-                    value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
-                />
-            </div>
-            <div className='fullwidthouterinputeditman'>
-                <input 
-                    className='innerfullwidthman' 
-                    type='text' 
                     placeholder='Bank Account Number' 
                     value={formData.bankDetails.accountNumber}
                     onChange={(e) => setFormData({
@@ -71,6 +62,8 @@ const EditInvestorDetails = ({edituserpopup, setEdituserpopup, formData, setForm
                         bankDetails: {...formData.bankDetails, accountNumber: e.target.value}
                     })}
                 />
+            </div>
+            <div className='fullwidthouterinputeditman'>
                 <input 
                     className='innerfullwidthman' 
                     type='text' 
@@ -81,8 +74,6 @@ const EditInvestorDetails = ({edituserpopup, setEdituserpopup, formData, setForm
                         bankDetails: {...formData.bankDetails, ifsc: e.target.value}
                     })}
                 />
-            </div>
-            <div className='fullwidthouterinputeditman'>
                 <input 
                     className='innerfullwidthman' 
                     type='text' 
@@ -93,6 +84,8 @@ const EditInvestorDetails = ({edituserpopup, setEdituserpopup, formData, setForm
                         bankDetails: {...formData.bankDetails, bankName: e.target.value}
                     })}
                 />
+            </div>
+            <div className='fullwidthouterinputeditman'>
                 <input 
                     className='innerfullwidthman' 
                     type='number' 
@@ -100,8 +93,6 @@ const EditInvestorDetails = ({edituserpopup, setEdituserpopup, formData, setForm
                     value={formData.totalMoneyInvested}
                     onChange={(e) => setFormData({...formData, totalMoneyInvested: e.target.value})}
                 />
-            </div>
-            <div className='fullwidthouterinputeditman'>
                 <input 
                     className='innerfullwidthman' 
                     type='number' 

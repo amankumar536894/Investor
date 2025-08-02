@@ -28,6 +28,29 @@ const PlansSection = () => {
         fetchPlans()
     }, [token])
 
+    const resetFormData = () => {
+        setFormData({
+            name: '',
+            status: 'Active',
+            minInvestment: '',
+            maxInvestment: '',
+            returnMultiplier: '',
+            durationMonths: '',
+            roiPaymentFrequency: 'Monthly',
+            description: ''
+        })
+    }
+
+    const handleAddPlanClick = () => {
+        resetFormData()
+        setAdduserpopup(true)
+    }
+
+    const handleCloseAddPopup = () => {
+        setAdduserpopup(false)
+        resetFormData()
+    }
+
     const fetchPlans = async () => {
         if (!token) return
 
@@ -79,17 +102,7 @@ const PlansSection = () => {
             if (response.ok) {
                 const data = await response.json()
                 console.log('Plan created:', data)
-                setAdduserpopup(false)
-                setFormData({
-                    name: '',
-                    status: 'Active',
-                    minInvestment: '',
-                    maxInvestment: '',
-                    returnMultiplier: '',
-                    durationMonths: '',
-                    roiPaymentFrequency: 'Monthly',
-                    description: ''
-                })
+                handleCloseAddPopup()
                 fetchPlans() // Refresh the plans list
             } else {
                 console.error('Failed to create plan')
@@ -210,7 +223,7 @@ const PlansSection = () => {
                         <p className='topboxlefttitle'>Investment Plans</p>
                         <p className='topboxleftdesc'>Manage your investment plans and returns</p>
                     </div>
-                    <div className="topboxright" onClick={()=>{setAdduserpopup(true)}}>
+                    <div className="topboxright" onClick={handleAddPlanClick}>
                         <Plus />
                         <p>Add Plans</p>
                     </div>
@@ -219,45 +232,45 @@ const PlansSection = () => {
                     {plans.length > 0 ? (
                         plans.map((plan) => (
                             <div key={plan._id} className="planbox">
-                                <div className='plantitlebox'>
+                        <div className='plantitlebox'>
                                     <p className='planname'>{plan.name}</p>
                                     <p className={`planstatus ${plan.status.toLowerCase()}`}>{plan.status}</p>
-                                </div>
-                                <div className='rangebox'>
-                                    <IndianRupee />
-                                    <div className='rangeinnerbox'>
-                                        <p className='investmentrangetitle'>Investment Range</p>
+                        </div>
+                        <div className='rangebox'>
+                            <IndianRupee />
+                            <div className='rangeinnerbox'>
+                                <p className='investmentrangetitle'>Investment Range</p>
                                         <p className='investmentrangeexact'>{formatRange(plan.minInvestment, plan.maxInvestment)}</p>
-                                    </div>
-                                </div>
-                                <div className='returntimeboth'>
-                                    <div className='returntimebothbox'>
-                                        <TrendingUp />
-                                        <div className='rangeinnerbox'>
+                            </div>
+                        </div>
+                        <div className='returntimeboth'>
+                            <div className='returntimebothbox'>
+                                <TrendingUp />
+                                <div className='rangeinnerbox'>
                                             <p className='investmentrangetitle'>{plan.returnMultiplier}x Return</p>
                                             <p className='investmentrangeexact'>In {plan.durationMonths} Months</p>
-                                        </div>
-                                    </div>
-                                    <div className='returntimebothbox'>
-                                        <Calendar />
-                                        <div className='rangeinnerbox'>
-                                            <p className='investmentrangetitle'>ROI Paid</p>
-                                            <p className='investmentrangeexact'>{plan.roiPaymentFrequency}</p>
-                                        </div>
-                                    </div>
                                 </div>
-                                <div className='planbtns'>
+                            </div>
+                            <div className='returntimebothbox'>
+                                <Calendar />
+                                <div className='rangeinnerbox'>
+                                    <p className='investmentrangetitle'>ROI Paid</p>
+                                            <p className='investmentrangeexact'>{plan.roiPaymentFrequency}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className='planbtns'>
                                     <div className='planperbtn' onClick={() => handleEditPlan(plan)}>
-                                       <SquarePen />
-                                       <p>Edit</p>
-                                    </div>
+                               <SquarePen />
+                               <p>Edit</p>
+                            </div>
                                     <div className='planperbtn' onClick={() => {
                                         setSelectedPlan(plan)
                                         setDeleteplanpopup(true)
                                     }}>
-                                        <Trash />
-                                       <p>Delete</p>
-                                    </div>
+                                <Trash />
+                               <p>Delete</p>
+                            </div>
                                 </div>
                             </div>
                         ))
@@ -268,9 +281,9 @@ const PlansSection = () => {
                     )}
                 </div>
 
-                <div className={`addplanpopup ${addplanpopup ? 'addplanpopupactive' : ''}`} onClick={()=>{setAdduserpopup(false)}} >
+                <div className={`addplanpopup ${addplanpopup ? 'addplanpopupactive' : ''}`} onClick={handleCloseAddPopup} >
                     <div className="inneraddplanpopup" onClick={(e) => e.stopPropagation()}>
-                        <X className="planaddcross" onClick={()=>{setAdduserpopup(false)}} />
+                        <X className="planaddcross" onClick={handleCloseAddPopup} />
                         <input 
                             type='text' 
                             placeholder='Enter Plan Name' 

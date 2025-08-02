@@ -45,7 +45,7 @@ const InvestorsSection = () => {
 
         try {
             setIsLoading(true)
-            const response = await fetch('http://localhost:5000/api/investors', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -69,7 +69,7 @@ const InvestorsSection = () => {
         if (!token) return
 
         try {
-            const response = await fetch('http://localhost:5000/api/investors/stats', {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors/stats`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -89,7 +89,7 @@ const InvestorsSection = () => {
         if (!token) return
 
         try {
-            const response = await fetch('http://localhost:5000/api/investors', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -160,7 +160,7 @@ const InvestorsSection = () => {
         if (!token || !selectedInvestor) return
 
         try {
-            const response = await fetch(`http://localhost:5000/api/investors/${selectedInvestor._id}`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors/${selectedInvestor._id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -170,8 +170,11 @@ const InvestorsSection = () => {
                     name: formData.name,
                     phoneNumber: formData.phoneNumber,
                     email: formData.email,
-                    address: formData.address,
-                    bankDetails: formData.bankDetails,
+                    bankDetails: {
+                        accountNumber: formData.bankDetails.accountNumber,
+                        ifsc: formData.bankDetails.ifsc,
+                        bankName: formData.bankDetails.bankName
+                    },
                     totalMoneyInvested: parseInt(formData.totalMoneyInvested),
                     totalReturns: parseInt(formData.totalReturns),
                     status: formData.status
@@ -197,7 +200,7 @@ const InvestorsSection = () => {
         if (!token || !selectedInvestor) return
 
         try {
-            const response = await fetch(`http://localhost:5000/api/investors/${selectedInvestor._id}`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/investors/${selectedInvestor._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
